@@ -6,6 +6,7 @@ import {
   IntensityLikelihoodLineChart,
   PestlePieChart,
   RegionBarChart,
+  SectorBarGrid3D,
   SectorRelevanceBarChart,
   TopicBarChart,
   WorldChoroplethMap,
@@ -339,5 +340,54 @@ describe('Analytics & Advanced Chart Components', () => {
         expect(screen.getByText('No data matches these filters')).toBeInTheDocument();
       });
     });
+  });
+
+  describe('SectorBarGrid3D (3D Sector Volume Matrix)', () => {
+    it('renders shared empty state when filtered dataset has 0 sector records', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockEmptyAggregatesData,
+      } as Response);
+
+      renderWithProviders(<SectorBarGrid3D />);
+
+      expect(screen.getByText('Sector Volume Matrix')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('No data matches these filters')).toBeInTheDocument();
+        expect(
+          screen.getByText('No signals match these filters — clear one to see more.'),
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Empty Data Propagation - All Chart Components', () => {
+    const allChartComponents = [
+      { name: 'IntensityLikelihoodLineChart', component: <IntensityLikelihoodLineChart /> },
+      { name: 'RegionBarChart', component: <RegionBarChart /> },
+      { name: 'TopicBarChart', component: <TopicBarChart /> },
+      { name: 'PestlePieChart', component: <PestlePieChart /> },
+      { name: 'SectorRelevanceBarChart', component: <SectorRelevanceBarChart /> },
+      { name: 'WorldChoroplethMap', component: <WorldChoroplethMap /> },
+      { name: 'D3RegionYearHeatmap', component: <D3RegionYearHeatmap /> },
+      { name: 'SectorBarGrid3D (3D Sector Volume Matrix)', component: <SectorBarGrid3D /> },
+    ];
+
+    it.each(allChartComponents)(
+      'renders shared empty-state component for $name when data is empty (not a blank canvas or crash)',
+      async ({ component }) => {
+        vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+          ok: true,
+          json: async () => mockEmptyAggregatesData,
+        } as Response);
+
+        const { getByTestId, getByText } = renderWithProviders(component);
+
+        await waitFor(() => {
+          expect(getByTestId('chart-empty-state')).toBeInTheDocument();
+          expect(getByText('No data matches these filters')).toBeInTheDocument();
+        });
+      },
+    );
   });
 });

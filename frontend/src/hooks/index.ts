@@ -1,1 +1,7 @@
-export { queryKeys, useAggregates, useFilters, useInsights } from './useInsightsQuery.js';
+export {
+  queryKeys,
+  useAggregates,
+  useCompatibleFilters,
+  useFilters,
+  useInsights,
+} from './useInsightsQuery.js';

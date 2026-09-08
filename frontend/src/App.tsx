@@ -10,12 +10,7 @@ import {
   SectorBarGrid3D,
   TopicBarChart,
 } from './charts/index.js';
-import {
-  ActiveFilterChips,
-  FilterSidebar,
-  Header,
-  ParallaxCard,
-} from './components/index.js';
+import { ActiveFilterChips, FilterSidebar, Header, ParallaxCard } from './components/index.js';
 import { FilterProvider, useFilterContext } from './context/index.js';
 import { useAggregates } from './hooks/index.js';
 

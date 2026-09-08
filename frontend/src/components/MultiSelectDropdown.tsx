@@ -48,9 +48,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   return (
     <div className="relative space-y-1" ref={dropdownRef}>
       <div className="flex items-center justify-between">
-        <label className="text-[11px] font-medium text-[#8B93A7]">
-          {label}
-        </label>
+        <label className="text-[11px] font-medium text-[#8B93A7]">{label}</label>
         {selectedValues.length > 0 && (
           <button
             type="button"

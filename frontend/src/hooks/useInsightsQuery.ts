@@ -1,5 +1,5 @@
 import { type UseQueryOptions, type UseQueryResult, useQuery } from '@tanstack/react-query';
-import { getAggregates, getFilters, getInsights } from '../api/index.js';
+import { getAggregates, getCompatibleFilters, getFilters, getInsights } from '../api/index.js';
 import type {
   AggregatesResponse,
   ApiResult,
@@ -59,6 +59,21 @@ export function useAggregates(
     queryKey: queryKeys.aggregates(params),
     queryFn: () => getAggregates(params),
     placeholderData: (previousData) => previousData,
+    ...options,
+  });
+}
+
+export function useCompatibleFilters(
+  params?: Partial<FilterParams>,
+  options?: Omit<
+    UseQueryOptions<ApiResult<FilterOptionsResponse>, Error, ApiResult<FilterOptionsResponse>>,
+    'queryKey' | 'queryFn'
+  >,
+): UseQueryResult<ApiResult<FilterOptionsResponse>, Error> {
+  return useQuery({
+    queryKey: ['filters', 'compatible', params] as const,
+    queryFn: () => getCompatibleFilters(params),
+    staleTime: 60 * 1000,
     ...options,
   });
 }

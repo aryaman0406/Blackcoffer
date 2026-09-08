@@ -188,14 +188,14 @@ describe('End-to-End Dashboard User Flows', () => {
       expect(screen.getByText('Avg Relevance')).toBeInTheDocument();
     });
 
-    // Verify all 7 Visualizations are present
-    expect(screen.getByText('Global Intensity Distribution Map')).toBeInTheDocument();
+    // Verify all Visualizations are present
+    expect(screen.getByText('Global Signals Radar')).toBeInTheDocument();
+    expect(screen.getByText('Sector Volume Matrix')).toBeInTheDocument();
     expect(screen.getByText('Region × Published Year Intensity Heatmap')).toBeInTheDocument();
     expect(screen.getByText('Intensity & Likelihood Trends')).toBeInTheDocument();
     expect(screen.getByText('Regional Record Distribution')).toBeInTheDocument();
     expect(screen.getByText('Top 15 Topics + Remaining Summary')).toBeInTheDocument();
     expect(screen.getByText('PESTLE Framework Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Average Relevance by Sector')).toBeInTheDocument();
 
     // Active filters bar should be hidden when no filters applied
     expect(screen.queryByText(/Active Filters \(/i)).not.toBeInTheDocument();
@@ -239,31 +239,125 @@ describe('End-to-End Dashboard User Flows', () => {
     });
   });
 
-  it('3. Handles multiple filters resulting in zero matching records gracefully', async () => {
-    // Return empty data on aggregates
+  it('3. Handles 3+ joint filters ending in zero records: asserts every panel shows empty state, 0 console errors, and Clear all repopulates', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    // First, provide normal mock responses
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes('/api/filters/compatible') && url.includes('country=Belize')) {
+        return {
+          ok: true,
+          json: async () => ({
+            topic: [],
+            sector: [],
+            region: [{ value: 'Central America', count: 2 }],
+            pestle: [],
+            source: [],
+            country: [{ value: 'Belize', count: 2 }],
+          }),
+        } as Response;
+      }
+      if (url.includes('/api/filters')) {
+        return {
+          ok: true,
+          json: async () => ({
+            ...mockFiltersData,
+            country: [...mockFiltersData.country, { value: 'Belize', count: 2 }],
+            region: [...mockFiltersData.region, { value: 'Africa', count: 10 }],
+          }),
+        } as Response;
+      }
+      return { ok: true, json: async () => mockAggregatesData } as Response;
+    });
+
+    render(<App />);
+
+    // Wait for initial dashboard load
+    await waitFor(() => {
+      expect(screen.getByText('Global Signals Radar')).toBeInTheDocument();
+      expect(screen.getByText('All Sectors')).toBeInTheDocument();
+    });
+
+    // Switch mock to empty aggregates when 3+ impossible filters are applied
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes('/api/filters/compatible')) {
+        return {
+          ok: true,
+          json: async () => ({
+            topic: [],
+            sector: [],
+            region: [],
+            pestle: [],
+            source: [],
+            country: [],
+          }),
+        } as Response;
+      }
+      if (url.includes('/api/filters')) {
+        return {
+          ok: true,
+          json: async () => mockFiltersData,
+        } as Response;
+      }
+      return { ok: true, json: async () => mockEmptyAggregatesData } as Response;
+    });
+
+    // 1. Apply Filter: Sector -> Energy
+    fireEvent.click(screen.getByText('All Sectors'));
+    await waitFor(() => expect(screen.getByText('Energy')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Energy'));
+
+    // 2. Apply Filter: Region -> Northern America
+    fireEvent.click(screen.getByText('All Regions'));
+    await waitFor(() => expect(screen.getByText('Northern America')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Northern America'));
+
+    // 3. Apply Filter: Country -> Russia (impossible with Northern America)
+    fireEvent.click(screen.getByText('All Countries'));
+    await waitFor(() => expect(screen.getByText('Russia')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Russia'));
+
+    // Assert that every single chart panel on the page shows the shared empty state
+    // Panels: GlobeHero, IntensityLikelihoodLineChart, SectorBarGrid3D, PestlePieChart, TopicBarChart, D3RegionYearHeatmap, RegionBarChart
+    await waitFor(() => {
+      const emptyStates = screen.getAllByTestId('chart-empty-state');
+      // All 6 panels (Globe + 5 sub-charts/grid) must be showing empty state
+      expect(emptyStates.length).toBeGreaterThanOrEqual(6);
+      for (const el of emptyStates) {
+        expect(el).toHaveTextContent('No data matches these filters');
+      }
+    });
+
+    // Assert zero console errors were logged during the whole flow
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+
+    // Now click 'Clear all' (from sidebar or active filters bar)
+    const clearAllBtns = screen.getAllByText('Clear all');
+    expect(clearAllBtns.length).toBeGreaterThan(0);
+    const clearBtn = clearAllBtns[0].closest('button') || clearAllBtns[0];
+    expect(clearBtn).toBeEnabled();
+
+    // Repopulate with normal aggregate data
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
       const url = String(input);
       if (url.includes('/api/filters')) {
         return { ok: true, json: async () => mockFiltersData } as Response;
       }
-      return { ok: true, json: async () => mockEmptyAggregatesData } as Response;
+      return { ok: true, json: async () => mockAggregatesData } as Response;
     });
 
-    render(<App />);
+    fireEvent.click(clearBtn);
 
-    // Apply Region filter
-    await waitFor(() => expect(screen.getByText('All Regions')).toBeInTheDocument());
-    const regionBtn = screen.getByText('All Regions');
-    fireEvent.click(regionBtn);
-
-    await waitFor(() => expect(screen.getByText('Northern America')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Northern America'));
-
-    // Verify charts render explicit empty state
+    // Assert every panel repopulates with non-empty data within timeout
     await waitFor(() => {
-      const emptyStates = screen.getAllByText('No data matches these filters');
-      expect(emptyStates.length).toBeGreaterThan(0);
+      expect(screen.queryAllByTestId('chart-empty-state')).toHaveLength(0);
+      expect(screen.getByText('Regional Record Distribution')).toBeInTheDocument();
+      expect(screen.getByText('Intensity & Likelihood Trends')).toBeInTheDocument();
     });
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('4. Cross-filters the entire dashboard on chart element click', async () => {

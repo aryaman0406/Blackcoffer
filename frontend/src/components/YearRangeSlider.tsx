@@ -48,9 +48,7 @@ export const YearRangeSlider: React.FC<YearRangeSliderProps> = ({ minYear, maxYe
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <Calendar className="h-3.5 w-3.5 text-[#8B93A7]" />
-          <label className="text-[11px] font-medium text-[#8B93A7]">
-            Published year
-          </label>
+          <label className="text-[11px] font-medium text-[#8B93A7]">Published year</label>
         </div>
 
         {isFiltered && (

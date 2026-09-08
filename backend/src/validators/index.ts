@@ -1,1 +1,6 @@
-export { queryFilterSchema, type QueryFilterParams } from './query.validator.js';
+export {
+  queryFilterSchema,
+  type QueryFilterParams,
+  compatibleFilterSchema,
+  type CompatibleFilterParams,
+} from './query.validator.js';

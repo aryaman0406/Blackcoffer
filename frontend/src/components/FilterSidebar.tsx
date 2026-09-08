@@ -1,7 +1,7 @@
 import { AlertCircle, RotateCcw, SlidersHorizontal, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useFilterContext } from '../context/index.js';
-import { useFilters } from '../hooks/index.js';
+import { useCompatibleFilters, useFilters } from '../hooks/index.js';
 import { MultiSelectDropdown } from './MultiSelectDropdown.js';
 import { SearchableSelect } from './SearchableSelect.js';
 import { YearRangeSlider } from './YearRangeSlider.js';
@@ -21,6 +21,17 @@ export const FilterSidebar: React.FC = () => {
   } = useFilterContext();
 
   const { data: filtersData, isLoading: isLoadingFilters, error: filtersError } = useFilters();
+
+  // If a country is selected, fetch compatible regions (and vice-versa)
+  const { data: compatibleByCountry } = useCompatibleFilters(
+    filters.country ? { country: filters.country } : undefined,
+    { enabled: Boolean(filters.country) },
+  );
+
+  const { data: compatibleByRegion } = useCompatibleFilters(
+    filters.region ? { region: filters.region } : undefined,
+    { enabled: Boolean(filters.region) },
+  );
 
   const [isNoteDismissed, setIsNoteDismissed] = useState(() => {
     try {
@@ -48,6 +59,18 @@ export const FilterSidebar: React.FC = () => {
     country: [],
   };
 
+  // If a country is selected, restrict region options to only compatible regions
+  const regionOptions =
+    filters.country && compatibleByCountry?.data?.region
+      ? compatibleByCountry.data.region
+      : options.region;
+
+  // If a region is selected, restrict country options to only compatible countries
+  const countryOptions =
+    filters.region && compatibleByRegion?.data?.country
+      ? compatibleByRegion.data.country
+      : options.country;
+
   return (
     <aside className="w-full lg:w-[280px] shrink-0 bg-[#131B2E]/85 border border-[#26314A] rounded-xl p-4 backdrop-blur-md flex flex-col gap-4 shadow-panel">
       {/* Sidebar Top Instrument Header */}
@@ -58,9 +81,7 @@ export const FilterSidebar: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h2 className="text-xs font-semibold tracking-wide text-[#ECE9E2]">
-                Filters
-              </h2>
+              <h2 className="text-xs font-semibold tracking-wide text-[#ECE9E2]">Filters</h2>
               {hasActiveFilters && (
                 <span className="inline-flex items-center rounded px-1.5 py-0.2 text-[10px] font-semibold bg-[#E8944A] text-[#0B1220] tabular-nums">
                   {activeFilterCount}
@@ -73,6 +94,7 @@ export const FilterSidebar: React.FC = () => {
         {/* Clear All Filters Button */}
         <button
           type="button"
+          data-testid="clear-all-filters-btn"
           onClick={clearFilters}
           disabled={!hasActiveFilters}
           className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg text-[#8B93A7] hover:text-[#ECE9E2] bg-[#0B1220] hover:bg-[#18233C] disabled:opacity-30 disabled:pointer-events-none border border-[#26314A] transition-colors focus-visible:ring-1 focus-visible:ring-[#E8944A]"
@@ -154,7 +176,7 @@ export const FilterSidebar: React.FC = () => {
         <SearchableSelect
           label="Region"
           value={filters.region}
-          options={options.region}
+          options={regionOptions}
           placeholder="All Regions"
           onChange={(val) => setFilter('region', val)}
           isLoading={isLoadingFilters}
@@ -184,7 +206,7 @@ export const FilterSidebar: React.FC = () => {
         <SearchableSelect
           label="Country"
           value={filters.country}
-          options={options.country}
+          options={countryOptions}
           placeholder="All Countries"
           onChange={(val) => setFilter('country', val)}
           isLoading={isLoadingFilters}

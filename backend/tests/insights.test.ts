@@ -334,4 +334,84 @@ describe('Insights API Integration Tests', () => {
       expect(response.body.byPestle).toEqual([]);
     });
   });
+
+  // ==========================================
+  // 4. Jointly Impossible Filters & Compatibility Tests
+  // ==========================================
+  describe('Jointly Impossible Filters & Compatibility (/api/filters/compatible)', () => {
+    it('returns total: 0 with empty data array (not a 500) for individually valid but jointly impossible query (region=Africa&country=Belize)', async () => {
+      const response = await request(app).get('/api/insights?region=Africa&country=Belize');
+
+      expect(response.status).toBe(200);
+      expect(response.body.total).toBe(0);
+      expect(response.body.data).toEqual([]);
+      expect(response.body.page).toBe(1);
+      expect(response.body.totalPages).toBe(0);
+    });
+
+    it('returns empty summary and empty aggregations for jointly impossible query', async () => {
+      const response = await request(app).get('/api/aggregates?region=Africa&country=Belize');
+
+      expect(response.status).toBe(200);
+      expect(response.body.summary.totalRecords).toBe(0);
+      expect(response.body.byRegion).toEqual([]);
+      expect(response.body.byCountry).toEqual([]);
+    });
+
+    it('returns only compatible regions when querying /api/filters/compatible?country=United States of America', async () => {
+      const response = await request(app).get(
+        '/api/filters/compatible?country=United States of America',
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body.region).toEqual([{ value: 'Northern America', count: 2 }]);
+      expect(
+        response.body.region.find((r: { value: string }) => r.value === 'Africa'),
+      ).toBeUndefined();
+    });
+
+    it('returns only compatible countries when querying /api/filters/compatible?region=Western Europe', async () => {
+      const response = await request(app).get('/api/filters/compatible?region=Western Europe');
+
+      expect(response.status).toBe(200);
+      expect(response.body.country).toEqual([{ value: 'Germany', count: 2 }]);
+      expect(
+        response.body.country.find(
+          (c: { value: string }) => c.value === 'United States of America',
+        ),
+      ).toBeUndefined();
+    });
+
+    it('asserts for every country in the dataset that its known region matches what /api/insights returns', async () => {
+      // Fetch distinct countries from dataset
+      const countries = await Insight.distinct('country');
+      expect(countries.length).toBeGreaterThan(0);
+
+      for (const country of countries) {
+        // Find known regions for this country in the DB
+        const knownRegions = await Insight.find({ country }).distinct('region');
+        expect(knownRegions.length).toBeGreaterThan(0);
+
+        for (const region of knownRegions) {
+          const res = await request(app).get(
+            `/api/insights?country=${encodeURIComponent(country)}&region=${encodeURIComponent(region)}`,
+          );
+          expect(res.status).toBe(200);
+          expect(res.body.total).toBeGreaterThan(0);
+          for (const item of res.body.data) {
+            expect(item.country).toBe(country);
+            expect(item.region).toBe(region);
+          }
+        }
+      }
+    });
+
+    it('asserts an impossible region for a known country returns 0 results on /api/insights', async () => {
+      // Germany is in Western Europe, not Eastern Asia or Northern America
+      const res = await request(app).get('/api/insights?country=Germany&region=Northern America');
+      expect(res.status).toBe(200);
+      expect(res.body.total).toBe(0);
+      expect(res.body.data).toEqual([]);
+    });
+  });
 });

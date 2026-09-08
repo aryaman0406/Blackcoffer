@@ -19,10 +19,7 @@ export const SectorRelevanceBarChart: React.FC = () => {
   const { filters, filterParams, setFilter } = useFilterContext();
 
   // Exclude sector from own aggregate query so top sectors remain visible
-  const chartFilterParams = useMemo(
-    () => ({ ...filterParams, sector: undefined }),
-    [filterParams],
-  );
+  const chartFilterParams = useMemo(() => ({ ...filterParams, sector: undefined }), [filterParams]);
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 

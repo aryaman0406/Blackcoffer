@@ -79,3 +79,16 @@ export const queryFilterSchema = z
   );
 
 export type QueryFilterParams = z.infer<typeof queryFilterSchema>;
+
+export const compatibleFilterSchema = z
+  .object({
+    country: z.string().trim().min(1).optional(),
+    region: z.string().trim().min(1).optional(),
+    sector: z.string().trim().min(1).optional(),
+    topic: z.string().trim().min(1).optional(),
+    pestle: z.string().trim().min(1).optional(),
+    source: z.string().trim().min(1).optional(),
+  })
+  .strict();
+
+export type CompatibleFilterParams = z.infer<typeof compatibleFilterSchema>;

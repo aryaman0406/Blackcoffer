@@ -4,13 +4,13 @@
 
 :root {
   color-scheme: dark;
-  --bg-base: #0B1220;
-  --panel-surface: #131B2E;
-  --text-primary: #ECE9E2;
-  --text-muted: #8B93A7;
-  --accent-signal: #E8944A;
-  --accent-secondary: #4FD1C5;
-  --border-hairline: #26314A;
+  --bg-base: #0b1220;
+  --panel-surface: #131b2e;
+  --text-primary: #ece9e2;
+  --text-muted: #8b93a7;
+  --accent-signal: #e8944a;
+  --accent-secondary: #4fd1c5;
+  --border-hairline: #26314a;
 }
 
 body {
@@ -19,16 +19,20 @@ body {
   min-height: 100vh;
   background-color: var(--bg-base);
   color: var(--text-primary);
-  font-family: "General Sans", system-ui, -apple-system, sans-serif;
+  font-family:
+    'General Sans',
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 /* Enable tabular-nums globally for data figures */
 .tabular-nums,
-[data-tabular-nums="true"],
+[data-tabular-nums='true'],
 .stat-value,
 .number-metric {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
+  font-feature-settings: 'tnum';
 }
 
 /* Glass panel utility */
@@ -50,18 +54,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #26314A;
+  background: #26314a;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3B4B6E;
+  background: #3b4b6e;
 }
 
 /* Keyboard focus states */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #0B1220, 0 0 0 4px #E8944A;
+  box-shadow:
+    0 0 0 2px #0b1220,
+    0 0 0 4px #e8944a;
 }
 
 /* Respect prefers-reduced-motion */

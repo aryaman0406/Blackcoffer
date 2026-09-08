@@ -6,3 +6,4 @@ coverage
 .husky/_
 *.lock
 package-lock.json
+jsondata.json

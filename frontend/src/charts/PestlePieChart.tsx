@@ -34,10 +34,7 @@ export const PestlePieChart: React.FC = () => {
   const { filters, filterParams, setFilter } = useFilterContext();
 
   // Exclude pestle dimension from own query to avoid collapsing to 1 slice
-  const chartFilterParams = useMemo(
-    () => ({ ...filterParams, pestle: undefined }),
-    [filterParams],
-  );
+  const chartFilterParams = useMemo(() => ({ ...filterParams, pestle: undefined }), [filterParams]);
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 

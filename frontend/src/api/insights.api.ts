@@ -18,6 +18,13 @@ export async function getFilters(): Promise<ApiResult<FilterOptionsResponse>> {
   return fetchApiResult<FilterOptionsResponse>('/filters');
 }
 
+export async function getCompatibleFilters(
+  params?: Partial<FilterParams>,
+): Promise<ApiResult<FilterOptionsResponse>> {
+  const query = buildQueryString(params as Record<string, unknown> | undefined);
+  return fetchApiResult<FilterOptionsResponse>(`/filters/compatible${query}`);
+}
+
 export async function getAggregates(params?: FilterParams): Promise<ApiResult<AggregatesResponse>> {
   const query = buildQueryString(params as Record<string, unknown> | undefined);
   return fetchApiResult<AggregatesResponse>(`/aggregates${query}`);

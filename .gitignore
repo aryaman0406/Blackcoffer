@@ -56,3 +56,7 @@ Desktop.ini
 .vscode/
 *.swp
 *.swo
+
+# Test Artifacts
+test-results/
+playwright-report/

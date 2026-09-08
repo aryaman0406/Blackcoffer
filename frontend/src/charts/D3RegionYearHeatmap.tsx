@@ -301,9 +301,7 @@ export const D3RegionYearHeatmap: React.FC = () => {
               </div>
               <div className="flex items-center justify-between gap-3 text-[11px]">
                 <span className="text-[#8B93A7]">Records:</span>
-                <span className="font-semibold text-[#4FD1C5] tabular-nums">
-                  {tooltip.count}
-                </span>
+                <span className="font-semibold text-[#4FD1C5] tabular-nums">{tooltip.count}</span>
               </div>
             </div>
           )}

@@ -19,10 +19,7 @@ export const TopicBarChart: React.FC = () => {
   const { filters, filterParams, toggleTopic } = useFilterContext();
 
   // Exclude topic from own aggregate query so top topics remain visible
-  const chartFilterParams = useMemo(
-    () => ({ ...filterParams, topic: undefined }),
-    [filterParams],
-  );
+  const chartFilterParams = useMemo(() => ({ ...filterParams, topic: undefined }), [filterParams]);
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 
@@ -49,8 +46,7 @@ export const TopicBarChart: React.FC = () => {
     if (!topTopic) return undefined;
 
     const totalInChart = chartData.reduce((acc, curr) => acc + curr.count, 0);
-    const topTopicPct =
-      totalInChart > 0 ? ((topTopic.count / totalInChart) * 100).toFixed(1) : '0';
+    const topTopicPct = totalInChart > 0 ? ((topTopic.count / totalInChart) * 100).toFixed(1) : '0';
 
     return `"${topTopic.topic}" is the most prominent topic (${topTopic.count} records, ${topTopicPct}% of displayed topics). Click bar to toggle.`;
   }, [chartData]);

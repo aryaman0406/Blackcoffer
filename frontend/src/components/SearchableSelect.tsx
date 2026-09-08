@@ -46,9 +46,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   return (
     <div className="relative space-y-1" ref={dropdownRef}>
       <div className="flex items-center justify-between">
-        <label className="text-[11px] font-medium text-[#8B93A7]">
-          {label}
-        </label>
+        <label className="text-[11px] font-medium text-[#8B93A7]">{label}</label>
         {value && (
           <button
             type="button"
@@ -62,6 +60,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
       <button
         type="button"
+        data-testid={`select-${label.toLowerCase()}`}
         onClick={() => setIsOpen((prev) => !prev)}
         disabled={isLoading}
         className={cn(
@@ -95,6 +94,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             <Search className="h-3 w-3 text-[#8B93A7] shrink-0" />
             <input
               type="text"
+              data-testid={`search-input-${label.toLowerCase()}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={`Search ${options.length} ${label.toLowerCase()}s...`}
@@ -116,6 +116,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div className="max-h-52 overflow-y-auto p-1 space-y-0.5 scrollbar-thin">
             <button
               type="button"
+              data-testid={`option-all-${label.toLowerCase()}`}
               onClick={() => {
                 onChange(undefined);
                 setIsOpen(false);
@@ -142,6 +143,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   <button
                     key={opt.value}
                     type="button"
+                    data-testid={`option-${opt.value}`}
                     onClick={() => {
                       onChange(opt.value);
                       setIsOpen(false);

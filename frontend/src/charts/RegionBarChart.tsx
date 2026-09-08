@@ -19,10 +19,7 @@ export const RegionBarChart: React.FC = () => {
   const { filters, filterParams, setFilter } = useFilterContext();
 
   // Exclude region dimension from own aggregate query to avoid collapsing to 1 bar
-  const chartFilterParams = useMemo(
-    () => ({ ...filterParams, region: undefined }),
-    [filterParams],
-  );
+  const chartFilterParams = useMemo(() => ({ ...filterParams, region: undefined }), [filterParams]);
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 
@@ -36,8 +33,7 @@ export const RegionBarChart: React.FC = () => {
       count: item.count,
       avgIntensity: item.avgIntensity,
       isUnspecified: item.region === 'Unspecified' || !item.region,
-      isSelected:
-        selectedRegion !== undefined && (item.region || 'Unspecified') === selectedRegion,
+      isSelected: selectedRegion !== undefined && (item.region || 'Unspecified') === selectedRegion,
     }));
   }, [aggregateResult, selectedRegion]);
 

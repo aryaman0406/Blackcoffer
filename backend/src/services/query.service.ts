@@ -1,6 +1,6 @@
 import type { RootFilterQuery } from 'mongoose';
 import { type IInsight, Insight } from '../models/index.js';
-import type { QueryFilterParams } from '../validators/index.js';
+import type { CompatibleFilterParams, QueryFilterParams } from '../validators/index.js';
 
 export interface FilterOptionItem {
   value: string;
@@ -172,6 +172,84 @@ export class QueryService {
 
   public static async getFilters(): Promise<FilterOptionsResponse> {
     const [result] = await Insight.aggregate<FilterOptionsResponse>([
+      {
+        $facet: {
+          topic: [
+            { $match: { topic: { $ne: null } } },
+            { $group: { _id: '$topic', count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, value: '$_id', count: 1 } },
+          ],
+          sector: [
+            { $match: { sector: { $ne: null } } },
+            { $group: { _id: '$sector', count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, value: '$_id', count: 1 } },
+          ],
+          region: [
+            { $match: { region: { $ne: null } } },
+            { $group: { _id: '$region', count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, value: '$_id', count: 1 } },
+          ],
+          pestle: [
+            { $match: { pestle: { $ne: null } } },
+            { $group: { _id: '$pestle', count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, value: '$_id', count: 1 } },
+          ],
+          source: [
+            { $match: { source: { $ne: null } } },
+            { $group: { _id: '$source', count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, value: '$_id', count: 1 } },
+          ],
+          country: [
+            { $match: { country: { $ne: null } } },
+            { $group: { _id: '$country', count: { $sum: 1 } } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, value: '$_id', count: 1 } },
+          ],
+        },
+      },
+    ]);
+
+    return {
+      topic: result?.topic ?? [],
+      sector: result?.sector ?? [],
+      region: result?.region ?? [],
+      pestle: result?.pestle ?? [],
+      source: result?.source ?? [],
+      country: result?.country ?? [],
+    };
+  }
+
+  public static async getCompatibleFilters(
+    params: CompatibleFilterParams,
+  ): Promise<FilterOptionsResponse> {
+    const matchQuery: RootFilterQuery<IInsight> = {};
+
+    if (params.country) {
+      matchQuery.country = params.country;
+    }
+    if (params.region) {
+      matchQuery.region = params.region;
+    }
+    if (params.sector) {
+      matchQuery.sector = params.sector;
+    }
+    if (params.topic) {
+      matchQuery.topic = params.topic;
+    }
+    if (params.pestle) {
+      matchQuery.pestle = params.pestle;
+    }
+    if (params.source) {
+      matchQuery.source = params.source;
+    }
+
+    const [result] = await Insight.aggregate<FilterOptionsResponse>([
+      { $match: matchQuery },
       {
         $facet: {
           topic: [

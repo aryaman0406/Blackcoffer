@@ -47,9 +47,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
 
         {/* Auto-generated dynamic caption */}
         {caption && !isLoading && !isEmpty && !error && (
-          <p className="text-[11px] text-[#8B93A7] leading-relaxed">
-            {caption}
-          </p>
+          <p className="text-[11px] text-[#8B93A7] leading-relaxed">{caption}</p>
         )}
       </div>
 

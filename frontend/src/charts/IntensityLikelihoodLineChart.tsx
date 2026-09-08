@@ -22,9 +22,7 @@ export const IntensityLikelihoodLineChart: React.FC = () => {
   // Filter out any invalid years and sort chronologically
   const chartData = useMemo(() => {
     const rawData = aggregateResult?.data?.byYear ?? [];
-    return rawData
-      .filter((item) => item.year && !isNaN(item.year))
-      .sort((a, b) => a.year - b.year);
+    return rawData.filter((item) => item.year && !isNaN(item.year)).sort((a, b) => a.year - b.year);
   }, [aggregateResult]);
 
   const isEmpty = chartData.length === 0;
@@ -58,12 +56,7 @@ export const IntensityLikelihoodLineChart: React.FC = () => {
             tickLine={false}
             axisLine={{ stroke: '#26314A' }}
           />
-          <YAxis
-            stroke="#8B93A7"
-            fontSize={11}
-            tickLine={false}
-            axisLine={{ stroke: '#26314A' }}
-          />
+          <YAxis stroke="#8B93A7" fontSize={11} tickLine={false} axisLine={{ stroke: '#26314A' }} />
           <Tooltip content={<CustomTooltip titlePrefix="Published Year" />} />
           <Legend
             verticalAlign="top"

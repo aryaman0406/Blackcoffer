@@ -1,6 +1,6 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Box } from 'lucide-react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Box, FilterX } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFilterContext } from '../context/index.js';
@@ -70,11 +70,7 @@ const SectorExtrudedBar: React.FC<{
       {(isSelected || hovered) && (
         <mesh position={[0, Math.max(0.1, currentHeightRef.current) + 0.01, 0]}>
           <boxGeometry args={[0.74, 0.04, 0.74]} />
-          <meshBasicMaterial
-            color={isSelected ? '#E8944A' : '#4FD1C5'}
-            transparent
-            opacity={0.9}
-          />
+          <meshBasicMaterial color={isSelected ? '#E8944A' : '#4FD1C5'} transparent opacity={0.9} />
         </mesh>
       )}
 
@@ -145,16 +141,14 @@ const SectorGridScene: React.FC<{
 
   return (
     <>
+      <WebGLContextHandler />
       <ambientLight intensity={0.8} />
       <directionalLight position={[10, 15, 10]} intensity={1.2} />
       <directionalLight position={[-10, 10, -10]} intensity={0.4} color="#4FD1C5" />
 
       {/* Base Grid Plane */}
       <group position={[0, -0.01, 0]}>
-        <gridHelper
-          args={[14, 14, '#4FD1C5', '#1B273F']}
-          position={[0, 0, 0]}
-        />
+        <gridHelper args={[14, 14, '#4FD1C5', '#1B273F']} position={[0, 0, 0]} />
       </group>
 
       {/* Bars Grid */}
@@ -190,6 +184,48 @@ const SectorGridScene: React.FC<{
   );
 };
 
+// WebGL Context Loss & Recovery listener
+const WebGLContextHandler: React.FC = () => {
+  const { gl } = useThree();
+
+  useEffect(() => {
+    console.count('canvas-mount');
+    console.count('sector-canvas-mount');
+
+    if (typeof window !== 'undefined') {
+      window.__CANVAS_MOUNTS__ = window.__CANVAS_MOUNTS__ || { globe: 0, sector: 0 };
+      window.__CANVAS_MOUNTS__.sector += 1;
+      window.__sectorCanvasMountCount = (window.__sectorCanvasMountCount || 0) + 1;
+    }
+
+    const canvas = gl.domElement;
+    if (!canvas) return;
+
+    canvas.setAttribute('data-testid', 'sector-canvas');
+    canvas.setAttribute('data-mount-count', String(window.__sectorCanvasMountCount || 1));
+
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.log('[WebGL Event] SectorGrid webglcontextlost handled successfully');
+    };
+
+    const handleContextRestored = () => {
+      console.log('[WebGL Event] SectorGrid webglcontextrestored handled successfully');
+      gl.renderLists.dispose();
+    };
+
+    canvas.addEventListener('webglcontextlost', handleContextLost, false);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored, false);
+
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+    };
+  }, [gl]);
+
+  return null;
+};
+
 export const SectorBarGrid3D: React.FC = () => {
   const { filters, filterParams, setFilter, resetFilter } = useFilterContext();
   const [use3D, setUse3D] = useState<boolean>(true);
@@ -211,10 +247,7 @@ export const SectorBarGrid3D: React.FC = () => {
   }, []);
 
   // Exclude sector from own aggregate query so comparison shows all sectors
-  const chartFilterParams = useMemo(
-    () => ({ ...filterParams, sector: undefined }),
-    [filterParams],
-  );
+  const chartFilterParams = useMemo(() => ({ ...filterParams, sector: undefined }), [filterParams]);
 
   const { data: aggregateResult, isLoading } = useAggregates(chartFilterParams);
 
@@ -337,18 +370,42 @@ export const SectorBarGrid3D: React.FC = () => {
         )}
 
         {use3D && isSupported ? (
-          <Canvas
-            camera={{ position: [5, 6, 7], fov: 38 }}
-            style={{ width: '100%', height: '100%' }}
-            gl={{ antialias: true, alpha: true }}
+          <div
+            data-testid="sector-grid-canvas-container"
+            data-mount-count={
+              typeof window !== 'undefined' ? window.__sectorCanvasMountCount || 1 : 1
+            }
+            className="relative w-full h-full min-h-[300px]"
           >
-            <SectorGridScene
-              sectors={barData}
-              selectedSector={filters.sector}
-              onSelectSector={handleSelectSector}
-              setTooltip={setTooltip}
-            />
-          </Canvas>
+            {barData.length === 0 && (
+              <div
+                data-testid="chart-empty-state"
+                className="absolute inset-0 z-10 flex flex-col items-center justify-center p-4 text-center rounded-lg bg-[#0B1220]/80 border border-[#26314A]/80 m-4"
+              >
+                <div className="w-8 h-8 rounded-full bg-[#18233C] flex items-center justify-center text-[#8B93A7] mb-1.5 border border-[#26314A]">
+                  <FilterX className="h-4 w-4" />
+                </div>
+                <p className="text-xs font-semibold text-[#ECE9E2]">
+                  No data matches these filters
+                </p>
+                <p className="text-[11px] text-[#8B93A7] mt-0.5 max-w-xs">
+                  No signals match these filters — clear one to see more.
+                </p>
+              </div>
+            )}
+            <Canvas
+              camera={{ position: [5, 6, 7], fov: 38 }}
+              style={{ width: '100%', height: '100%' }}
+              gl={{ antialias: true, alpha: true }}
+            >
+              <SectorGridScene
+                sectors={barData}
+                selectedSector={filters.sector}
+                onSelectSector={handleSelectSector}
+                setTooltip={setTooltip}
+              />
+            </Canvas>
+          </div>
         ) : (
           <div className="w-full h-full p-2">
             <SectorRelevanceBarChart />
@@ -365,9 +422,7 @@ export const SectorBarGrid3D: React.FC = () => {
             <div className="flex items-center gap-3 text-[11px]">
               <div>
                 <span className="text-[#8B93A7]">Signals: </span>
-                <span className="font-semibold text-[#4FD1C5] tabular-nums">
-                  {tooltip.count}
-                </span>
+                <span className="font-semibold text-[#4FD1C5] tabular-nums">{tooltip.count}</span>
               </div>
               <div>
                 <span className="text-[#8B93A7]">Relevance: </span>

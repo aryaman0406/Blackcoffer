@@ -167,4 +167,63 @@ describe('FilterSidebar Component', () => {
 
     expect(screen.getByText('Energy (70)')).toBeInTheDocument();
   });
+
+  it('restricts Region options to only compatible regions when Country: Belize is selected (excluding Africa)', async () => {
+    // Mock /filters/compatible?country=Belize returning only Northern America (and excluding Africa)
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+      const urlStr = String(url);
+      if (urlStr.includes('/filters/compatible') && urlStr.includes('country=Belize')) {
+        return {
+          ok: true,
+          json: async () => ({
+            topic: [],
+            sector: [],
+            region: [{ value: 'Central America', count: 2 }],
+            pestle: [],
+            source: [],
+            country: [{ value: 'Belize', count: 2 }],
+          }),
+        } as Response;
+      }
+      if (urlStr.includes('/filters')) {
+        return {
+          ok: true,
+          json: async () => ({
+            ...mockFiltersData,
+            country: [...mockFiltersData.country, { value: 'Belize', count: 2 }],
+            region: [...mockFiltersData.region, { value: 'Africa', count: 10 }],
+          }),
+        } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({ data: [], total: 2, page: 1, totalPages: 1 }),
+      } as Response;
+    });
+
+    renderComponent();
+
+    // Select Country: Belize
+    await waitFor(() => {
+      expect(screen.getByText('All Countries')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('All Countries'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Belize')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Belize'));
+
+    // Open Region dropdown
+    await waitFor(() => {
+      expect(screen.getByText('All Regions')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('All Regions'));
+
+    // Assert compatible Region: Central America is present, and Africa is excluded
+    await waitFor(() => {
+      expect(screen.getByText('Central America')).toBeInTheDocument();
+      expect(screen.queryByText('Africa')).not.toBeInTheDocument();
+    });
+  });
 });
