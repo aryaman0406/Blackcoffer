@@ -1,20 +1,27 @@
 services:
   - type: web
-    name: blackcoffer-analytics-backend
-    runtime: node
+    name: blackcoffer-backend
+    env: node
     plan: free
-    buildCommand: npm install && npm run build --workspace=backend
-    startCommand: npm run start --workspace=backend
-    healthCheckPath: /health
-    autoDeploy: true
+    region: oregon
+    buildCommand: npm install && npm run build && npm prune --production
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: MONGODB_URI
-        sync: false
-      - key: CLIENT_URL
-        sync: false
-      - key: RATE_LIMIT_MAX
-        value: 500
+        fromSecret: mongodb_uri
+      - key: CORS_ORIGIN
+        value: https://your-frontend-url.onrender.com
+    rootDir: backend
+
+  - type: static
+    name: blackcoffer-frontend
+    env: static
+    plan: free
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://blackcoffer-backend.onrender.com/api
