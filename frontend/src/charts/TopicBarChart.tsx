@@ -19,7 +19,10 @@ export const TopicBarChart: React.FC = () => {
   const { filters, filterParams, toggleTopic } = useFilterContext();
 
   // Exclude topic from own aggregate query so top topics remain visible
-  const chartFilterParams = useMemo(() => ({ ...filterParams, topic: undefined }), [filterParams]);
+  const chartFilterParams = useMemo(
+    () => ({ ...filterParams, topic: undefined }),
+    [filterParams],
+  );
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 
@@ -46,9 +49,10 @@ export const TopicBarChart: React.FC = () => {
     if (!topTopic) return undefined;
 
     const totalInChart = chartData.reduce((acc, curr) => acc + curr.count, 0);
-    const topTopicPct = totalInChart > 0 ? ((topTopic.count / totalInChart) * 100).toFixed(1) : '0';
+    const topTopicPct =
+      totalInChart > 0 ? ((topTopic.count / totalInChart) * 100).toFixed(1) : '0';
 
-    return `"${topTopic.topic}" is the most prominent topic (${topTopic.count} records, ${topTopicPct}% of displayed topics). Click bar to cross-filter.`;
+    return `"${topTopic.topic}" is the most prominent topic (${topTopic.count} records, ${topTopicPct}% of displayed topics). Click bar to toggle.`;
   }, [chartData]);
 
   const handleTopicClick = (topicName: string) => {
@@ -69,11 +73,10 @@ export const TopicBarChart: React.FC = () => {
     >
       <div className="w-full h-full flex flex-col justify-between">
         {selectedTopics.length > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-sky-400 mb-1 px-1">
-            <MousePointerClick className="w-3.5 h-3.5 animate-pulse" />
+          <div className="flex items-center gap-1.5 text-xs text-[#E8944A] mb-1 px-1">
+            <MousePointerClick className="h-3.5 w-3.5" />
             <span>
-              Selected Topics: <strong>{selectedTopics.join(', ')}</strong> (Click bar or chip to
-              toggle)
+              Active: <strong>{selectedTopics.join(', ')}</strong>
             </span>
           </div>
         )}
@@ -83,45 +86,45 @@ export const TopicBarChart: React.FC = () => {
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+              margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
             >
               <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#334155"
+                strokeDasharray="2 2"
+                stroke="#26314A"
                 horizontal={false}
-                opacity={0.5}
+                opacity={0.6}
               />
               <XAxis
                 type="number"
-                stroke="#94a3b8"
+                stroke="#8B93A7"
                 fontSize={11}
                 tickLine={false}
-                axisLine={{ stroke: '#475569' }}
+                axisLine={{ stroke: '#26314A' }}
               />
               <YAxis
                 type="category"
                 dataKey="topic"
-                stroke="#cbd5e1"
+                stroke="#8B93A7"
                 fontSize={11}
-                width={95}
+                width={90}
                 tickLine={false}
-                axisLine={{ stroke: '#475569' }}
-                tick={{ fill: '#cbd5e1' }}
+                axisLine={{ stroke: '#26314A' }}
+                tick={{ fill: '#ECE9E2' }}
               />
               <Tooltip content={<CustomTooltip titlePrefix="Topic" />} />
-              <Bar dataKey="count" name="Record Count" radius={[0, 4, 4, 0]}>
+              <Bar dataKey="count" name="Signals" radius={[0, 3, 3, 0]}>
                 {chartData.map((entry, index) => {
                   const isFiltered = selectedTopics.length > 0;
                   const isThisSelected = entry.isSelected;
-                  let fill = entry.isOther ? '#64748b' : '#38bdf8';
-                  let fillOpacity = entry.isOther ? 0.75 : 0.9;
+                  let fill = entry.isOther ? '#334155' : '#E8944A';
+                  let fillOpacity = entry.isOther ? 0.7 : 0.85;
 
                   if (isFiltered && !entry.isOther) {
                     if (isThisSelected) {
-                      fill = '#38bdf8';
+                      fill = '#E8944A';
                       fillOpacity = 1;
                     } else {
-                      fillOpacity = 0.35;
+                      fillOpacity = 0.25;
                     }
                   }
 
@@ -130,11 +133,11 @@ export const TopicBarChart: React.FC = () => {
                       key={`topic-cell-${index}`}
                       fill={fill}
                       fillOpacity={fillOpacity}
-                      stroke={isThisSelected ? '#ffffff' : 'none'}
-                      strokeWidth={isThisSelected ? 2 : 0}
+                      stroke={isThisSelected ? '#ECE9E2' : 'none'}
+                      strokeWidth={isThisSelected ? 1.5 : 0}
                       onClick={() => handleTopicClick(entry.topic)}
-                      className={`transition-all duration-150 ${
-                        entry.isOther ? 'cursor-default' : 'cursor-pointer hover:brightness-125'
+                      className={`transition-opacity ${
+                        entry.isOther ? 'cursor-default' : 'cursor-pointer hover:opacity-100'
                       }`}
                     />
                   );

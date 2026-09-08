@@ -46,16 +46,16 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   }, [options, searchTerm]);
 
   return (
-    <div className="relative space-y-1.5" ref={dropdownRef}>
+    <div className="relative space-y-1" ref={dropdownRef}>
       <div className="flex items-center justify-between">
-        <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <label className="text-[11px] font-medium text-[#8B93A7]">
           {label}
         </label>
         {selectedValues.length > 0 && (
           <button
             type="button"
             onClick={onClear}
-            className="text-[11px] text-sky-400 hover:text-sky-300 transition-colors"
+            className="text-[10px] text-[#E8944A] hover:text-[#ECE9E2] transition-colors"
           >
             Clear ({selectedValues.length})
           </button>
@@ -68,10 +68,10 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
         onClick={() => setIsOpen((prev) => !prev)}
         disabled={isLoading}
         className={cn(
-          'w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg border text-left transition-all duration-150',
-          'bg-slate-900/80 border-slate-700/80 hover:border-slate-600 focus:outline-none focus:ring-1 focus:ring-sky-500',
-          selectedValues.length > 0 ? 'text-slate-100 font-medium' : 'text-slate-400',
-          isLoading && 'opacity-60 cursor-not-allowed',
+          'w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-lg border text-left transition-colors',
+          'bg-[#0B1220] border-[#26314A] hover:border-[#3B4B6E] focus-visible:ring-1 focus-visible:ring-[#E8944A]',
+          selectedValues.length > 0 ? 'text-[#ECE9E2] font-medium' : 'text-[#8B93A7]',
+          isLoading && 'opacity-50 cursor-not-allowed',
         )}
       >
         <span className="truncate">
@@ -83,14 +83,14 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
         </span>
         <div className="flex items-center gap-1.5 ml-2 shrink-0">
           {selectedValues.length > 0 && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+            <span className="px-1.5 py-0.2 text-[10px] font-semibold bg-[#E8944A]/15 text-[#E8944A] border border-[#E8944A]/30 rounded tabular-nums">
               {selectedValues.length}
             </span>
           )}
           <ChevronDown
             className={cn(
-              'w-4 h-4 text-slate-400 transition-transform duration-200',
-              isOpen && 'rotate-180 text-sky-400',
+              'h-3.5 w-3.5 text-[#8B93A7] transition-transform duration-150',
+              isOpen && 'rotate-180 text-[#E8944A]',
             )}
           />
         </div>
@@ -98,20 +98,20 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 
       {/* Selected Tags Pills */}
       {selectedValues.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-1 max-h-24 overflow-y-auto scrollbar-thin">
+        <div className="flex flex-wrap gap-1 pt-0.5 max-h-20 overflow-y-auto scrollbar-thin">
           {selectedValues.map((val) => (
             <span
               key={val}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-sky-500/15 text-sky-300 border border-sky-500/30"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#E8944A]/15 text-[#E8944A] border border-[#E8944A]/30"
             >
-              <span className="truncate max-w-[120px]">{val}</span>
+              <span className="truncate max-w-[110px]">{val}</span>
               <button
                 type="button"
                 onClick={() => onRemove(val)}
                 className="hover:text-white transition-colors"
                 aria-label={`Remove ${val}`}
               >
-                <X className="w-3 h-3" />
+                <X className="h-2.5 w-2.5" />
               </button>
             </span>
           ))}
@@ -120,33 +120,33 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 rounded-xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          {/* Search Header */}
-          <div className="p-2 border-b border-slate-800 flex items-center gap-2 bg-slate-950/60">
-            <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
+        <div className="absolute z-50 w-full mt-1 rounded-lg border border-[#26314A] bg-[#131B2E] shadow-panel overflow-hidden">
+          {/* Search Input */}
+          <div className="p-2 border-b border-[#26314A] flex items-center gap-2 bg-[#0E1524]">
+            <Search className="h-3 w-3 text-[#8B93A7] shrink-0" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={`Search ${options.length} topics...`}
-              className="w-full bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none"
+              placeholder={`Filter ${options.length} topics...`}
+              className="w-full bg-transparent text-xs text-[#ECE9E2] placeholder-[#8B93A7] focus:outline-none"
               autoFocus
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="text-slate-500 hover:text-slate-300 p-0.5"
+                className="text-[#8B93A7] hover:text-[#ECE9E2]"
               >
-                <X className="w-3 h-3" />
+                <X className="h-3 w-3" />
               </button>
             )}
           </div>
 
           {/* Options List */}
-          <div className="max-h-60 overflow-y-auto p-1.5 space-y-0.5 scrollbar-thin scrollbar-thumb-slate-700">
+          <div className="max-h-52 overflow-y-auto p-1 space-y-0.5 scrollbar-thin">
             {filteredOptions.length === 0 ? (
-              <div className="px-3 py-4 text-center text-xs text-slate-500">No matching topics</div>
+              <div className="px-3 py-3 text-center text-xs text-[#8B93A7]">No signals found</div>
             ) : (
               filteredOptions.map((opt) => {
                 const isChecked = selectedValues.includes(opt.value);
@@ -156,27 +156,27 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                     type="button"
                     onClick={() => onToggle(opt.value)}
                     className={cn(
-                      'w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-md transition-colors text-left group',
+                      'w-full flex items-center justify-between px-2 py-1.5 text-xs rounded transition-colors text-left group',
                       isChecked
-                        ? 'bg-sky-500/20 text-sky-200 font-medium'
-                        : 'text-slate-300 hover:bg-slate-800/80',
+                        ? 'bg-[#E8944A]/15 text-[#ECE9E2] font-medium'
+                        : 'text-[#ECE9E2] hover:bg-[#18233C]',
                     )}
                   >
                     <div className="flex items-center gap-2 truncate mr-2">
                       <div
                         className={cn(
-                          'w-3.5 h-3.5 rounded flex items-center justify-center border transition-colors shrink-0',
+                          'h-3 w-3 rounded flex items-center justify-center border transition-colors shrink-0',
                           isChecked
-                            ? 'bg-sky-500 border-sky-500 text-white'
-                            : 'border-slate-600 bg-slate-800 group-hover:border-slate-500',
+                            ? 'bg-[#E8944A] border-[#E8944A] text-[#0B1220]'
+                            : 'border-[#26314A] bg-[#0B1220] group-hover:border-[#3B4B6E]',
                         )}
                       >
-                        {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                        {isChecked && <Check className="h-2 w-2 stroke-[3]" />}
                       </div>
                       <span className="truncate">{opt.value}</span>
                     </div>
 
-                    <span className="text-[10px] text-slate-400 px-1.5 py-0.5 rounded-full bg-slate-800 shrink-0 group-hover:bg-slate-700">
+                    <span className="text-[10px] text-[#8B93A7] px-1 py-0.2 rounded bg-[#0B1220] shrink-0 tabular-nums">
                       {opt.count}
                     </span>
                   </button>

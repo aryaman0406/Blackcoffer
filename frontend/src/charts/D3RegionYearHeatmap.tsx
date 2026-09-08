@@ -84,7 +84,7 @@ export const D3RegionYearHeatmap: React.FC = () => {
     const peak = [...rawHeatmap].sort((a, b) => b.avgIntensity - a.avgIntensity)[0];
     if (!peak) return undefined;
 
-    return `Peak concentration: ${peak.region} in ${peak.year} (Avg Intensity: ${peak.avgIntensity}, ${peak.count} records). Click any cell to cross-filter.`;
+    return `Peak concentration: ${peak.region} in ${peak.year} (Avg: ${peak.avgIntensity.toFixed(1)}, ${peak.count} records). Click any cell to cross-filter dashboard by Region & Year.`;
   }, [rawHeatmap]);
 
   // D3 Render Effect with full cleanup
@@ -94,13 +94,12 @@ export const D3RegionYearHeatmap: React.FC = () => {
     }
 
     const svg = d3.select(svgRef.current);
-    // Remove previous render elements to avoid React / D3 DOM conflicts
     svg.selectAll('*').remove();
 
     const containerWidth = containerRef.current.clientWidth || 600;
-    const containerHeight = Math.max(regions.length * 32 + 80, 260);
+    const containerHeight = Math.max(regions.length * 28 + 70, 240);
 
-    const margin = { top: 30, right: 30, bottom: 40, left: 130 };
+    const margin = { top: 25, right: 20, bottom: 35, left: 120 };
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
@@ -113,7 +112,7 @@ export const D3RegionYearHeatmap: React.FC = () => {
 
     const yScale = d3.scaleBand<string>().domain(regions).range([0, height]).padding(0.08);
 
-    // Color Interpolator (Slate -> Deep Cyan -> Electric Sky Blue -> Bright Amber)
+    // Color scale: Teal spectrum
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, maxIntensity]);
 
     // X Axis
@@ -121,21 +120,21 @@ export const D3RegionYearHeatmap: React.FC = () => {
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale).tickFormat((d) => String(d)))
       .call((axis) => {
-        axis.select('.domain').attr('stroke', '#475569');
-        axis.selectAll('.tick line').attr('stroke', '#475569');
-        axis.selectAll('.tick text').attr('fill', '#94a3b8').attr('font-size', '11px');
+        axis.select('.domain').attr('stroke', '#26314A');
+        axis.selectAll('.tick line').attr('stroke', '#26314A');
+        axis.selectAll('.tick text').attr('fill', '#8B93A7').attr('font-size', '10px');
       });
 
     // Y Axis
     g.append('g')
       .call(d3.axisLeft(yScale))
       .call((axis) => {
-        axis.select('.domain').attr('stroke', '#475569');
-        axis.selectAll('.tick line').attr('stroke', '#475569');
+        axis.select('.domain').attr('stroke', '#26314A');
+        axis.selectAll('.tick line').attr('stroke', '#26314A');
         axis
           .selectAll('.tick text')
-          .attr('fill', '#cbd5e1')
-          .attr('font-size', '11px')
+          .attr('fill', '#ECE9E2')
+          .attr('font-size', '10px')
           .attr('font-weight', '500');
       });
 
@@ -169,7 +168,7 @@ export const D3RegionYearHeatmap: React.FC = () => {
 
         const isAnyFilterActive = selectedRegion !== undefined || selectedMinYear !== undefined;
 
-        const cellFill = hasData ? colorScale(intensity) : '#1e293b';
+        const cellFill = hasData ? colorScale(intensity) : '#131B2E';
         let cellOpacity = 1;
 
         if (isAnyFilterActive && hasData) {
@@ -182,7 +181,7 @@ export const D3RegionYearHeatmap: React.FC = () => {
           if (matchesRegion && matchesYear) {
             cellOpacity = 1;
           } else {
-            cellOpacity = 0.35;
+            cellOpacity = 0.25;
           }
         }
 
@@ -192,24 +191,24 @@ export const D3RegionYearHeatmap: React.FC = () => {
           .attr('y', cellY)
           .attr('width', cellW)
           .attr('height', cellH)
-          .attr('rx', 4)
-          .attr('ry', 4)
+          .attr('rx', 3)
+          .attr('ry', 3)
           .attr('fill', cellFill)
           .attr('fill-opacity', cellOpacity)
-          .attr('stroke', isCellSelected ? '#ffffff' : '#0f172a')
-          .attr('stroke-width', isCellSelected ? 2.5 : 1.5)
+          .attr('stroke', isCellSelected ? '#ECE9E2' : '#0B1220')
+          .attr('stroke-width', isCellSelected ? 2 : 1)
           .style('cursor', hasData ? 'pointer' : 'default')
           .style('transition', 'all 0.15s ease-in-out');
 
         if (hasData) {
           rect
             .on('mouseenter', (event: MouseEvent) => {
-              rect.attr('stroke', '#38bdf8').attr('stroke-width', 2.5);
+              rect.attr('stroke', '#4FD1C5').attr('stroke-width', 2);
               const rectBounds = containerRef.current?.getBoundingClientRect();
               setTooltip({
                 visible: true,
-                x: event.clientX - (rectBounds?.left ?? 0) + 12,
-                y: event.clientY - (rectBounds?.top ?? 0) - 20,
+                x: event.clientX - (rectBounds?.left ?? 0) + 10,
+                y: event.clientY - (rectBounds?.top ?? 0) - 15,
                 region,
                 year,
                 avgIntensity: intensity,
@@ -220,18 +219,17 @@ export const D3RegionYearHeatmap: React.FC = () => {
               const rectBounds = containerRef.current?.getBoundingClientRect();
               setTooltip((prev) => ({
                 ...prev,
-                x: event.clientX - (rectBounds?.left ?? 0) + 12,
-                y: event.clientY - (rectBounds?.top ?? 0) - 20,
+                x: event.clientX - (rectBounds?.left ?? 0) + 10,
+                y: event.clientY - (rectBounds?.top ?? 0) - 15,
               }));
             })
             .on('mouseleave', () => {
               rect
-                .attr('stroke', isCellSelected ? '#ffffff' : '#0f172a')
-                .attr('stroke-width', isCellSelected ? 2.5 : 1.5);
+                .attr('stroke', isCellSelected ? '#ECE9E2' : '#0B1220')
+                .attr('stroke-width', isCellSelected ? 2 : 1);
               setTooltip((prev) => ({ ...prev, visible: false }));
             })
             .on('click', () => {
-              // Toggle cross-filter region and year
               if (
                 selectedRegion === region &&
                 selectedMinYear === year &&
@@ -247,20 +245,16 @@ export const D3RegionYearHeatmap: React.FC = () => {
         }
       });
     });
-
-    return () => {
-      svg.selectAll('*').remove();
-    };
   }, [
     regions,
     years,
     rawHeatmap,
     maxIntensity,
-    isEmpty,
-    isLoading,
     selectedRegion,
     selectedMinYear,
     selectedMaxYear,
+    isEmpty,
+    isLoading,
     setFilter,
     resetFilter,
     setYearRange,
@@ -274,53 +268,43 @@ export const D3RegionYearHeatmap: React.FC = () => {
       isLoading={isLoading}
       isEmpty={isEmpty}
       error={error ? error.message : aggregateResult?.error}
-      className="col-span-full"
+      skeletonType="bar"
     >
       <div className="w-full h-full flex flex-col justify-between" ref={containerRef}>
-        {/* Heatmap Instructions & Legend */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2 text-xs text-slate-400">
-          <div className="flex items-center gap-1.5 text-sky-400">
-            <MousePointerClick className="w-3.5 h-3.5" />
-            <span className="text-[11px]">
-              Click any cell to cross-filter dashboard by Region & Year
+        {(selectedRegion || selectedMinYear) && (
+          <div className="flex items-center gap-1.5 text-xs text-[#E8944A] mb-1 px-1">
+            <MousePointerClick className="h-3.5 w-3.5" />
+            <span>
+              Active Matrix: {selectedRegion ? <strong>{selectedRegion}</strong> : 'All'}{' '}
+              {selectedMinYear ? `(${selectedMinYear})` : ''}
             </span>
           </div>
+        )}
 
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-400">0 (Low)</span>
-            <div className="w-24 h-2 rounded-full bg-gradient-to-r from-slate-800 via-sky-600 to-amber-400 border border-slate-700" />
-            <span className="text-[10px] text-slate-400">{maxIntensity} (High)</span>
-          </div>
-        </div>
+        <div className="w-full flex-1 min-h-0 relative">
+          <svg ref={svgRef} className="w-full h-full" />
 
-        {/* SVG Container */}
-        <div className="w-full relative flex-1 min-h-[260px] overflow-x-auto overflow-y-hidden">
-          <svg ref={svgRef} className="w-full h-full min-w-[550px]" />
-
-          {/* Floating D3 Tooltip */}
+          {/* Tooltip Overlay */}
           {tooltip.visible && (
             <div
-              className="absolute pointer-events-none z-50 rounded-xl border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl p-3 shadow-2xl text-xs space-y-1"
-              style={{
-                left: `${tooltip.x}px`,
-                top: `${tooltip.y}px`,
-                transform: 'translateY(-50%)',
-              }}
+              className="absolute z-50 pointer-events-none rounded-lg bg-[#131B2E]/95 border border-[#26314A] p-2 shadow-2xl backdrop-blur-md text-xs space-y-1 transform -translate-x-1/2 -translate-y-full"
+              style={{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }}
             >
-              <div className="font-bold text-white border-b border-slate-800 pb-1">
+              <div className="font-semibold text-[#ECE9E2] border-b border-[#26314A] pb-0.5">
                 {tooltip.region} ({tooltip.year})
               </div>
-              <div className="flex justify-between gap-3 text-slate-300">
-                <span className="text-slate-400">Avg Intensity:</span>
-                <span className="font-bold text-sky-400">
-                  {Number.isFinite(tooltip.avgIntensity) ? tooltip.avgIntensity.toFixed(1) : '0.0'}
+              <div className="flex items-center justify-between gap-3 text-[11px]">
+                <span className="text-[#8B93A7]">Intensity:</span>
+                <span className="font-semibold text-[#E8944A] tabular-nums">
+                  {tooltip.avgIntensity.toFixed(1)}
                 </span>
               </div>
-              <div className="flex justify-between gap-3 text-slate-300">
-                <span className="text-slate-400">Record Count:</span>
-                <span className="font-bold text-slate-100">{tooltip.count}</span>
+              <div className="flex items-center justify-between gap-3 text-[11px]">
+                <span className="text-[#8B93A7]">Records:</span>
+                <span className="font-semibold text-[#4FD1C5] tabular-nums">
+                  {tooltip.count}
+                </span>
               </div>
-              <div className="text-[10px] text-sky-400/80 pt-0.5">Click cell to filter/reset</div>
             </div>
           )}
         </div>

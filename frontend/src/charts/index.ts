@@ -1,9 +1,11 @@
 export { ChartContainer } from './ChartContainer.js';
 export { CustomTooltip } from './CustomTooltip.js';
 export { D3RegionYearHeatmap } from './D3RegionYearHeatmap.js';
+export { GlobeHero } from './GlobeHero.js';
 export { IntensityLikelihoodLineChart } from './IntensityLikelihoodLineChart.js';
 export { PestlePieChart } from './PestlePieChart.js';
 export { RegionBarChart } from './RegionBarChart.js';
+export { SectorBarGrid3D } from './SectorBarGrid3D.js';
 export { SectorRelevanceBarChart } from './SectorRelevanceBarChart.js';
 export { TopicBarChart } from './TopicBarChart.js';
 export { WorldChoroplethMap } from './WorldChoroplethMap.js';

@@ -7,33 +7,37 @@ import { ChartContainer } from './ChartContainer.js';
 import { CustomTooltip } from './CustomTooltip.js';
 
 const PESTLE_COLORS: Record<string, string> = {
-  Economic: '#0ea5e9', // Sky Blue
-  Political: '#8b5cf6', // Violet
-  Industries: '#10b981', // Emerald
-  Technological: '#f59e0b', // Amber
-  Environmental: '#14b8a6', // Teal
-  Social: '#ec4899', // Pink
-  Healthcare: '#06b6d4', // Cyan
-  Organization: '#6366f1', // Indigo
-  Unspecified: '#64748b', // Slate
+  Economic: '#4FD1C5',
+  Political: '#38B2AC',
+  Industries: '#319795',
+  Technological: '#2C7A7B',
+  Environmental: '#285E61',
+  Social: '#4B5563',
+  Healthcare: '#6B7280',
+  Organization: '#9CA3AF',
+  Unspecified: '#374151',
 };
 
 const FALLBACK_PALETTE = [
-  '#0ea5e9',
-  '#8b5cf6',
-  '#10b981',
-  '#f59e0b',
-  '#ec4899',
-  '#14b8a6',
-  '#6366f1',
-  '#64748b',
+  '#4FD1C5',
+  '#38B2AC',
+  '#319795',
+  '#2C7A7B',
+  '#285E61',
+  '#4B5563',
+  '#6B7280',
+  '#9CA3AF',
+  '#374151',
 ];
 
 export const PestlePieChart: React.FC = () => {
   const { filters, filterParams, setFilter } = useFilterContext();
 
   // Exclude pestle dimension from own query to avoid collapsing to 1 slice
-  const chartFilterParams = useMemo(() => ({ ...filterParams, pestle: undefined }), [filterParams]);
+  const chartFilterParams = useMemo(
+    () => ({ ...filterParams, pestle: undefined }),
+    [filterParams],
+  );
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 
@@ -63,7 +67,7 @@ export const PestlePieChart: React.FC = () => {
     if (!topPestle) return undefined;
     const topPct = total > 0 ? ((topPestle.value / total) * 100).toFixed(1) : '0';
 
-    return `${topPestle.name} factors lead PESTLE distribution with ${topPestle.value} records (${topPct}% of total). Click slice to cross-filter.`;
+    return `${topPestle.name} factors lead PESTLE distribution with ${topPestle.value} records (${topPct}% of signals). Click slice to filter.`;
   }, [chartData]);
 
   const handleSliceClick = (pestleName: string) => {
@@ -86,10 +90,10 @@ export const PestlePieChart: React.FC = () => {
     >
       <div className="w-full h-full flex flex-col justify-between">
         {selectedPestle && (
-          <div className="flex items-center gap-1.5 text-xs text-purple-400 mb-1 px-1">
-            <MousePointerClick className="w-3.5 h-3.5 animate-pulse" />
+          <div className="flex items-center gap-1.5 text-xs text-[#E8944A] mb-1 px-1">
+            <MousePointerClick className="h-3.5 w-3.5" />
             <span>
-              Filtering by <strong>{selectedPestle}</strong> (Click slice or chip to reset)
+              Filtering: <strong>{selectedPestle}</strong>
             </span>
           </div>
         )}
@@ -97,13 +101,13 @@ export const PestlePieChart: React.FC = () => {
         <div className="w-full flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-              <Tooltip content={<CustomTooltip titlePrefix="PESTLE" />} />
+              <Tooltip content={<CustomTooltip titlePrefix="Pillar" />} />
               <Legend
                 verticalAlign="bottom"
                 align="center"
-                height={36}
+                height={32}
                 iconType="circle"
-                wrapperStyle={{ fontSize: '11px', color: '#cbd5e1', paddingTop: '10px' }}
+                wrapperStyle={{ fontSize: '11px', color: '#8B93A7', paddingTop: '6px' }}
                 onClick={(entry) => {
                   if (entry && typeof entry.value === 'string') {
                     handleSliceClick(entry.value);
@@ -115,7 +119,7 @@ export const PestlePieChart: React.FC = () => {
                 cx="50%"
                 cy="45%"
                 innerRadius={45}
-                outerRadius={80}
+                outerRadius={75}
                 paddingAngle={2}
                 dataKey="value"
                 nameKey="name"
@@ -132,11 +136,11 @@ export const PestlePieChart: React.FC = () => {
                   const color =
                     PESTLE_COLORS[entry.name] ||
                     FALLBACK_PALETTE[index % FALLBACK_PALETTE.length] ||
-                    '#38bdf8';
+                    '#4FD1C5';
 
-                  let fillOpacity = 0.9;
+                  let fillOpacity = 0.85;
                   if (isFiltered) {
-                    fillOpacity = isThisSelected ? 1 : 0.35;
+                    fillOpacity = isThisSelected ? 1 : 0.25;
                   }
 
                   return (
@@ -144,9 +148,9 @@ export const PestlePieChart: React.FC = () => {
                       key={`cell-${index}`}
                       fill={color}
                       fillOpacity={fillOpacity}
-                      stroke={isThisSelected ? '#ffffff' : '#0f172a'}
-                      strokeWidth={isThisSelected ? 3 : 2}
-                      className="cursor-pointer transition-all duration-150 hover:opacity-100"
+                      stroke={isThisSelected ? '#ECE9E2' : '#0B1220'}
+                      strokeWidth={isThisSelected ? 2.5 : 1.5}
+                      className="cursor-pointer transition-opacity"
                     />
                   );
                 })}

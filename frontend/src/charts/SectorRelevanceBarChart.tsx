@@ -19,7 +19,10 @@ export const SectorRelevanceBarChart: React.FC = () => {
   const { filters, filterParams, setFilter } = useFilterContext();
 
   // Exclude sector from own aggregate query so top sectors remain visible
-  const chartFilterParams = useMemo(() => ({ ...filterParams, sector: undefined }), [filterParams]);
+  const chartFilterParams = useMemo(
+    () => ({ ...filterParams, sector: undefined }),
+    [filterParams],
+  );
 
   const { data: aggregateResult, isLoading, error } = useAggregates(chartFilterParams);
 
@@ -30,7 +33,7 @@ export const SectorRelevanceBarChart: React.FC = () => {
     return rawSectors
       .filter((item) => item.count > 0)
       .sort((a, b) => b.avgRelevance - a.avgRelevance)
-      .slice(0, 10) // Show top 10 sectors by relevance
+      .slice(0, 10)
       .map((item) => ({
         sector: item.sector,
         avgRelevance: item.avgRelevance,
@@ -53,10 +56,10 @@ export const SectorRelevanceBarChart: React.FC = () => {
     if (!topCoverageSector || !highestRelevanceSector) return undefined;
 
     if (topCoverageSector.sector === highestRelevanceSector.sector) {
-      return `${topCoverageSector.sector} is the most-covered sector (${topCoverageSector.count} records) with highest avg relevance of ${topCoverageSector.avgRelevance}/10. Click bar to cross-filter.`;
+      return `${topCoverageSector.sector} is the most-covered sector (${topCoverageSector.count} records) with highest relevance ${topCoverageSector.avgRelevance.toFixed(1)}/10. Click bar to filter.`;
     }
 
-    return `${topCoverageSector.sector} is the most-covered sector (${topCoverageSector.count} records), while ${highestRelevanceSector.sector} leads in avg relevance (${highestRelevanceSector.avgRelevance}/10). Click bar to cross-filter.`;
+    return `${topCoverageSector.sector} is the most-covered sector (${topCoverageSector.count} records), while ${highestRelevanceSector.sector} leads relevance (${highestRelevanceSector.avgRelevance.toFixed(1)}/10). Click bar to filter.`;
   }, [chartData]);
 
   const handleSectorClick = (sectorName: string) => {
@@ -79,49 +82,49 @@ export const SectorRelevanceBarChart: React.FC = () => {
     >
       <div className="w-full h-full flex flex-col justify-between">
         {selectedSector && (
-          <div className="flex items-center gap-1.5 text-xs text-purple-400 mb-1 px-1">
-            <MousePointerClick className="w-3.5 h-3.5 animate-pulse" />
+          <div className="flex items-center gap-1.5 text-xs text-[#E8944A] mb-1 px-1">
+            <MousePointerClick className="h-3.5 w-3.5" />
             <span>
-              Filtering by <strong>{selectedSector}</strong> (Click bar or chip to reset)
+              Filtering: <strong>{selectedSector}</strong>
             </span>
           </div>
         )}
 
         <div className="w-full flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 25 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
+            <BarChart data={chartData} margin={{ top: 10, right: 15, left: -15, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="2 2" stroke="#26314A" opacity={0.6} />
               <XAxis
                 dataKey="sector"
-                stroke="#cbd5e1"
+                stroke="#8B93A7"
                 fontSize={10}
                 tickLine={false}
-                axisLine={{ stroke: '#475569' }}
-                angle={-25}
+                axisLine={{ stroke: '#26314A' }}
+                angle={-20}
                 textAnchor="end"
                 interval={0}
               />
               <YAxis
-                stroke="#94a3b8"
+                stroke="#8B93A7"
                 fontSize={11}
                 tickLine={false}
-                axisLine={{ stroke: '#475569' }}
+                axisLine={{ stroke: '#26314A' }}
                 domain={[0, 10]}
               />
               <Tooltip content={<CustomTooltip titlePrefix="Sector" />} />
-              <Bar dataKey="avgRelevance" name="Avg Relevance" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="avgRelevance" name="Relevance" radius={[3, 3, 0, 0]}>
                 {chartData.map((entry, index) => {
                   const isFiltered = selectedSector !== undefined;
                   const isThisSelected = entry.isSelected;
-                  let fill = '#a855f7';
-                  let fillOpacity = 0.9;
+                  let fill = '#4FD1C5';
+                  let fillOpacity = 0.85;
 
                   if (isFiltered) {
                     if (isThisSelected) {
-                      fill = '#c084fc';
+                      fill = '#4FD1C5';
                       fillOpacity = 1;
                     } else {
-                      fillOpacity = 0.35;
+                      fillOpacity = 0.25;
                     }
                   }
 
@@ -130,10 +133,10 @@ export const SectorRelevanceBarChart: React.FC = () => {
                       key={`sector-cell-${index}`}
                       fill={fill}
                       fillOpacity={fillOpacity}
-                      stroke={isThisSelected ? '#ffffff' : 'none'}
-                      strokeWidth={isThisSelected ? 2 : 0}
+                      stroke={isThisSelected ? '#ECE9E2' : 'none'}
+                      strokeWidth={isThisSelected ? 1.5 : 0}
                       onClick={() => handleSectorClick(entry.sector)}
-                      className="cursor-pointer transition-all duration-150 hover:brightness-125"
+                      className="cursor-pointer transition-opacity"
                     />
                   );
                 })}

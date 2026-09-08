@@ -44,11 +44,11 @@ export const YearRangeSlider: React.FC<YearRangeSliderProps> = ({ minYear, maxYe
   };
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Calendar className="w-3.5 h-3.5 text-sky-400" />
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <Calendar className="h-3.5 w-3.5 text-[#8B93A7]" />
+          <label className="text-[11px] font-medium text-[#8B93A7]">
             Published year
           </label>
         </div>
@@ -57,33 +57,33 @@ export const YearRangeSlider: React.FC<YearRangeSliderProps> = ({ minYear, maxYe
           <button
             type="button"
             onClick={handleReset}
-            className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 transition-colors"
+            className="flex items-center gap-1 text-[10px] text-[#E8944A] hover:text-[#ECE9E2] transition-colors"
           >
-            <RotateCcw className="w-2.5 h-2.5" />
+            <RotateCcw className="h-2.5 w-2.5" />
             Reset
           </button>
         )}
       </div>
 
-      <div className="p-3 rounded-lg border border-slate-700/80 bg-slate-900/80 space-y-3">
+      <div className="p-2.5 rounded-lg border border-[#26314A] bg-[#0B1220] space-y-2.5">
         {/* Selected Range Display */}
         <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+          <span className="font-semibold text-[#E8944A] bg-[#E8944A]/15 px-1.5 py-0.2 rounded border border-[#E8944A]/30 tabular-nums">
             {currentMin}
           </span>
-          <span className="text-[11px] text-slate-400 font-medium">
-            {isFiltered ? `${currentMin} – ${currentMax}` : 'All published years'}
+          <span className="text-[10px] text-[#8B93A7]">
+            {isFiltered ? `${currentMin} – ${currentMax}` : 'All Timeline'}
           </span>
-          <span className="font-semibold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+          <span className="font-semibold text-[#E8944A] bg-[#E8944A]/15 px-1.5 py-0.2 rounded border border-[#E8944A]/30 tabular-nums">
             {currentMax}
           </span>
         </div>
 
         {/* Dual Sliders */}
         <div className="space-y-2">
-          <div className="space-y-1">
-            <div className="flex justify-between text-[10px] text-slate-400">
-              <span>From: {currentMin}</span>
+          <div className="space-y-0.5">
+            <div className="flex justify-between text-[10px] text-[#8B93A7] tabular-nums">
+              <span>Start: {currentMin}</span>
               <span>Min: {availableMin}</span>
             </div>
             <input
@@ -92,13 +92,13 @@ export const YearRangeSlider: React.FC<YearRangeSliderProps> = ({ minYear, maxYe
               max={availableMax}
               value={currentMin}
               onChange={handleMinChange}
-              className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500"
+              className="w-full h-1 bg-[#26314A] rounded-lg appearance-none cursor-pointer accent-[#E8944A]"
             />
           </div>
 
-          <div className="space-y-1">
-            <div className="flex justify-between text-[10px] text-slate-400">
-              <span>To: {currentMax}</span>
+          <div className="space-y-0.5">
+            <div className="flex justify-between text-[10px] text-[#8B93A7] tabular-nums">
+              <span>End: {currentMax}</span>
               <span>Max: {availableMax}</span>
             </div>
             <input
@@ -107,7 +107,7 @@ export const YearRangeSlider: React.FC<YearRangeSliderProps> = ({ minYear, maxYe
               max={availableMax}
               value={currentMax}
               onChange={handleMaxChange}
-              className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500"
+              className="w-full h-1 bg-[#26314A] rounded-lg appearance-none cursor-pointer accent-[#E8944A]"
             />
           </div>
         </div>

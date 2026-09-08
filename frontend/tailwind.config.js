@@ -5,19 +5,30 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+        terminal: {
+          bg: '#0B1220',
+          panel: '#131B2E',
+          'panel-glass': 'rgba(19, 27, 46, 0.75)',
+          'panel-hover': '#18233C',
+          text: '#ECE9E2',
+          muted: '#8B93A7',
+          accent: '#E8944A',
+          'accent-glow': 'rgba(232, 148, 74, 0.25)',
+          secondary: '#4FD1C5',
+          'secondary-glow': 'rgba(79, 209, 197, 0.25)',
+          border: '#26314A',
+          'border-subtle': '#1B243B',
         },
+      },
+      fontFamily: {
+        sans: ['"General Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['"General Sans"', 'sans-serif'],
+      },
+      boxShadow: {
+        panel: '0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px #26314A',
+        'panel-raised': '0 10px 30px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px #26314A',
+        glow: '0 0 20px -3px rgba(232, 148, 74, 0.35)',
+        'glow-teal': '0 0 20px -3px rgba(79, 209, 197, 0.35)',
       },
     },
   },

@@ -1,4 +1,4 @@
-import { AlertCircle, BarChart2, Filter, Layers, RotateCcw, X } from 'lucide-react';
+import { AlertCircle, RotateCcw, SlidersHorizontal, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useFilterContext } from '../context/index.js';
 import { useFilters } from '../hooks/index.js';
@@ -49,23 +49,24 @@ export const FilterSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-full lg:w-80 shrink-0 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 backdrop-blur-xl flex flex-col gap-5 shadow-xl">
-      {/* Sidebar Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+    <aside className="w-full lg:w-[280px] shrink-0 bg-[#131B2E]/85 border border-[#26314A] rounded-xl p-4 backdrop-blur-md flex flex-col gap-4 shadow-panel">
+      {/* Sidebar Top Instrument Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-[#26314A]">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20">
-            <Filter className="w-4 h-4" />
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#E8944A]/10 text-[#E8944A] border border-[#E8944A]/25">
+            <SlidersHorizontal className="h-3.5 w-3.5" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-white tracking-wide flex items-center gap-1.5">
-              Filters
+            <div className="flex items-center gap-1.5">
+              <h2 className="text-xs font-semibold tracking-wide text-[#ECE9E2]">
+                Filters
+              </h2>
               {hasActiveFilters && (
-                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500 text-white leading-none">
+                <span className="inline-flex items-center rounded px-1.5 py-0.2 text-[10px] font-semibold bg-[#E8944A] text-[#0B1220] tabular-nums">
                   {activeFilterCount}
                 </span>
               )}
-            </h2>
-            <p className="text-[11px] text-slate-400">Refine dashboard analytics</p>
+            </div>
           </div>
         </div>
 
@@ -74,74 +75,61 @@ export const FilterSidebar: React.FC = () => {
           type="button"
           onClick={clearFilters}
           disabled={!hasActiveFilters}
-          className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 disabled:opacity-40 disabled:pointer-events-none border border-slate-700/60"
+          className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg text-[#8B93A7] hover:text-[#ECE9E2] bg-[#0B1220] hover:bg-[#18233C] disabled:opacity-30 disabled:pointer-events-none border border-[#26314A] transition-colors focus-visible:ring-1 focus-visible:ring-[#E8944A]"
         >
-          <RotateCcw className="w-3 h-3 text-sky-400" />
+          <RotateCcw className="h-3 w-3 text-[#E8944A]" />
           <span>Clear all</span>
         </button>
       </div>
 
-      {/* Matching Records Counter Badge */}
-      <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-sky-500/10 to-blue-600/10 border border-sky-500/20">
-        <div className="flex items-center gap-2">
-          <div className="p-1 rounded-md bg-sky-500/20 text-sky-400">
-            <BarChart2 className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">
-              Matching Records
-            </span>
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold text-white tracking-tight">
-                {isLoadingMatchingCount ? (
-                  <span className="inline-block w-12 h-4 bg-slate-700 animate-pulse rounded" />
-                ) : (
-                  matchingCount.toLocaleString()
-                )}
-              </span>
-              <span className="text-[11px] text-slate-400">records</span>
-            </div>
+      {/* Matching Records Metric Box */}
+      <div className="flex items-center justify-between p-3 rounded-lg bg-[#0E1524] border border-[#26314A]/80 shadow-inner">
+        <div>
+          <div className="text-[11px] text-[#8B93A7]">Matching Records</div>
+          <div className="text-base font-bold text-[#ECE9E2] tabular-nums">
+            {isLoadingMatchingCount ? (
+              <span className="inline-block w-14 h-4 bg-[#26314A] animate-pulse rounded" />
+            ) : (
+              matchingCount.toLocaleString()
+            )}
           </div>
         </div>
-
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          Live
-        </span>
+        <div className="text-right">
+          <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium text-[#4FD1C5] bg-[#4FD1C5]/10 border border-[#4FD1C5]/20">
+            Active
+          </span>
+        </div>
       </div>
 
-      {/* Dismissible Dataset Note */}
+      {/* Dismissible Dataset Scope Notice */}
       {!isNoteDismissed && (
-        <div className="relative flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
-          <AlertCircle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
-          <div className="pr-4">
-            <p className="font-medium text-amber-200">Dataset scope notice</p>
-            <p className="text-[11px] text-amber-300/90 mt-0.5 leading-relaxed">
-              This dataset does not include city-level or SWOT data.
-            </p>
+        <div className="relative flex items-start gap-2 p-2.5 rounded-lg bg-[#18233C]/80 border border-[#26314A] text-xs text-[#8B93A7]">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-[#E8944A] mt-0.5" />
+          <div className="pr-3 text-[11px] leading-relaxed">
+            This dataset does not include city-level or SWOT data.
           </div>
           <button
             type="button"
             onClick={handleDismissNote}
-            className="absolute top-2.5 right-2.5 p-1 rounded-md text-amber-400/70 hover:text-amber-200 hover:bg-amber-500/20 transition-colors"
+            className="absolute top-2 right-2 text-[#8B93A7] hover:text-[#ECE9E2]"
             aria-label="Dismiss note"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="h-3 w-3" />
           </button>
         </div>
       )}
 
       {/* Filters Fetch Error Alert */}
       {filtersError && (
-        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-          <span>Failed to load filter options. Retrying...</span>
+        <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-xs flex items-center gap-2">
+          <AlertCircle className="h-3.5 w-3.5 text-red-400 shrink-0" />
+          <span>Failed to load filter options.</span>
         </div>
       )}
 
-      {/* Filter Controls List */}
-      <div className="flex flex-col gap-4 overflow-y-auto pr-1 scrollbar-thin">
-        {/* 1. Topic: Searchable Multi-Select (97 values) */}
+      {/* Filter Controls Stack */}
+      <div className="flex flex-col gap-3.5 overflow-y-auto pr-0.5">
+        {/* 1. Topic: Multi-Select */}
         <MultiSelectDropdown
           label="Topic"
           selectedValues={filters.topic}
@@ -177,12 +165,12 @@ export const FilterSidebar: React.FC = () => {
           label="PESTLE"
           value={filters.pestle}
           options={options.pestle}
-          placeholder="All PESTLE"
+          placeholder="All Geopolitical Pillars"
           onChange={(val) => setFilter('pestle', val)}
           isLoading={isLoadingFilters}
         />
 
-        {/* 5. Source: Searchable Single-Select (403 values) */}
+        {/* 5. Source: Single-Select */}
         <SearchableSelect
           label="Source"
           value={filters.source}
@@ -192,7 +180,7 @@ export const FilterSidebar: React.FC = () => {
           isLoading={isLoadingFilters}
         />
 
-        {/* 6. Country: Searchable Single-Select */}
+        {/* 6. Country: Single-Select */}
         <SearchableSelect
           label="Country"
           value={filters.country}
@@ -209,23 +197,6 @@ export const FilterSidebar: React.FC = () => {
           onChange={setYearRange}
         />
       </div>
-
-      {/* Active Filters Summary Footer */}
-      {hasActiveFilters && (
-        <div className="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-          <span className="flex items-center gap-1">
-            <Layers className="w-3 h-3 text-sky-400" />
-            {activeFilterCount} active filter{activeFilterCount > 1 ? 's' : ''} applied
-          </span>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="text-sky-400 hover:text-sky-300 font-medium transition-colors"
-          >
-            Reset
-          </button>
-        </div>
-      )}
     </aside>
   );
 };
