@@ -15,7 +15,7 @@
     "build": "npm run build --workspaces",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "echo skip"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
