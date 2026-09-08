@@ -52,7 +52,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
       </div>
 
       {/* Chart Body */}
-      <div className="w-full h-64 relative flex items-center justify-center">
+      <div className="w-full h-full min-h-[256px] relative flex items-center justify-center">
         {isLoading ? (
           /* Loading Skeleton */
           <div
