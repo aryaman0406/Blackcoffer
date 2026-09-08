@@ -12,7 +12,7 @@ services:
       - key: MONGODB_URI
         fromSecret: mongodb_uri
       - key: CLIENT_URL
-        value: https://blackcoffer-frontend.onrender.com
+        value: https://blackcoffer-pi2b.onrender.com
     rootDir: backend
 
   - type: static
