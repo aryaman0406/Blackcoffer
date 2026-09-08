@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "husky install",
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "npx tsc",
     "start": "node dist/server.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -35,6 +36,7 @@
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1",
-    "vitest": "^3.0.7"
+    "vitest": "^3.0.7",
+    "husky": "^9.0.0"
   }
 }
