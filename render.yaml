@@ -11,8 +11,8 @@ services:
         value: production
       - key: MONGODB_URI
         fromSecret: mongodb_uri
-      - key: CORS_ORIGIN
-        value: https://your-frontend-url.onrender.com
+      - key: CLIENT_URL
+        value: https://blackcoffer-frontend.onrender.com
     rootDir: backend
 
   - type: static
@@ -24,4 +24,4 @@ services:
     publishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://blackcoffer-backend.onrender.com/api
+        value: https://blackcoffer-backend-d0lk.onrender.com/api
