@@ -78,3 +78,8 @@ npm run lint
 # Format code with Prettier
 npm run format
 ```
+
+## Deploy on Render
+
+Add the `render.yaml` file to the repository root. Render will automatically detect it and deploy the backend as a web service and the frontend as a static site. Ensure required environment variables are set in the Render dashboard (see `.env.example`).
+
